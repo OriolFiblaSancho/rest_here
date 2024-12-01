@@ -10,10 +10,116 @@
         <div class="image">
             <img src="img/ds3.webp" alt="Dark Souls Resting at bonfire"> 
         </div>
-
+            
         <div class="interactive_box">
-            <h1>ZzZ</h1>
+           <button class="play">Click here to rest. Best with audio -> </button>
+        </div>
+
+        <div class="backgroundAudio">
+            <button></button>
         </div>
 
     </body>
+
+    <script>
+    
+        
+        
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            let button = document.querySelector(".backgroundAudio") 
+
+                button.addEventListener("click", () => {
+                let etiquetaAudio = document.createElement("audio")
+                etiquetaAudio.setAttribute("src", "audio/end.mp3")
+                etiquetaAudio.play()
+                    
+            })
+    
+            let container = document.querySelector('.interactive_box');
+            let playButton = document.querySelector('.play');
+    
+            let textLines = [
+                {String:"We did it, player!", speed: 150},
+                {String:"We are in the last month of 2024", speed: 150},
+                {String:"Many were left behind ...", speed: 150},
+                {String:"Do you remember them ?", speed: 150},
+                {String:"They were good people", speed: 150},
+                {String:"But now we have to rest", speed: 150},
+                {String:"ZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZzZZ", speed: 2000},
+               
+            ];
+    
+            let characters = [];
+            let currentLineIndex = 0;
+    
+            function prepareCharacters(line) {
+                
+                characters = [];
+                line.String.split('').forEach(character => {
+                    var span = document.createElement('span');
+                    span.textContent = character;
+                    container.appendChild(span);
+                    characters.push({
+                        span: span,
+                        isSpace: character === ' ',
+                        delayAfter: line.speed,
+                        classes: line.classes || []
+                    });
+                });
+            }
+    
+            function revealOneCharacter(list) {
+                let audio = new Audio('audio/text.wav');
+                audio.volume = 0.3;
+                audio.load();
+    
+                let next = list.splice(0, 1)[0];
+                next.span.classList.add('revealed');
+    
+                if (!next.isSpace) {
+                    audio.currentTime = 0;
+                    audio.play();
+                    console.log('audio played');
+                }
+    
+                let delay = next.isSpace ? 0 : next.delayAfter;
+    
+                if (list.length > 0) {
+                    setTimeout(() => {
+                        revealOneCharacter(list);
+                    }, delay);
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            }   
+    
+            playButton.addEventListener('click', function() {
+                let backgroundAudio = new Audio('audio/text.wav');
+                backgroundAudio.volume = 0.3;
+                backgroundAudio.loop = true;
+                backgroundAudio.load();
+                backgroundAudio.play();
+                playButton.style.display = 'none';
+                prepareCharacters(textLines[currentLineIndex]);
+                revealOneCharacter(characters);
+            });
+    
+            container.addEventListener('click', function() {
+                if (characters.length === 0 && currentLineIndex < textLines.length - 1) {
+                    currentLineIndex++;
+                    container.innerHTML = ''; // Clear the container
+                    prepareCharacters(textLines[currentLineIndex]);
+                    revealOneCharacter(characters);
+                }
+            });
+    
+        
+    
+        });
+    </script>
 </html>
+
